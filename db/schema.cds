@@ -17,7 +17,7 @@ entity Products : cuid, managed {
     rating       : Decimal(3, 2); //1.05
     currency     : String;
     detail       : Association to ProductDetails; //(detail_ID) --> 9ea4f4c3-6fac-4a79-a278-7f4516ab5a37
-    supplier     : Association to Suppliers;
+    supplier     : Association to Suppliers;    // supplier_ID
     toReviews    : Association to many Reviews
                        on toReviews.product = $self;
     toInventories : Association to many Inventories
@@ -104,4 +104,5 @@ entity Status : CodeList {
             OutOfStock = 'Out of Stock';
             LowAvailability = 'Low Availability';
         };
+    criricality: Int16;
 };
