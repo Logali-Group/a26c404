@@ -23,3 +23,10 @@ File or Folder | Purpose
 ## Learn More
 
 Learn more at https://cap.cloud.sap/docs/get-started/.
+
+
+## How to Install CAP
+- Borrar la dependencia @cap-js/sqlite
+- Ejecutar el comando: npm i
+- Ejecutar el comando: npm add -D @cap-js/sqlite
+- Levantar el servidor con: cds watch
