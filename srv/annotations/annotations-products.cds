@@ -1,7 +1,14 @@
 using {Products as myservice} from '../service';
+
 using from './annotations-suppliers';
+using from './annotations-reviews';
+using from './annotations-inventories';
+using from './annotations-sales';
+
+annotate myservice.Products with @odata.draft.enabled;
 
 annotate myservice.Products with {
+    image       @title: 'Image' @UI.IsImage;
     product     @title: 'Product';
     productName @title: 'Product Name';
     description @title: 'Description';
@@ -10,90 +17,87 @@ annotate myservice.Products with {
     supplier    @title: 'Supplier';
     statu       @title: 'Status';
     rating      @title: 'Rating';
-    price       @title: 'Price' @Measures.ISOCurrency : currency;
+    price       @title: 'Price'     @Measures.ISOCurrency: currency;
     currency    @title: 'Currency'  @Common.IsCurrency;
 };
 
 annotate myservice.Products with {
-    product @Common: {
-        Text : productName,
-    };
-    category @Common: {
-        Text : category.category,
-        TextArrangement : #TextOnly,
-        ValueList : {
-            $Type : 'Common.ValueListType',
-            CollectionPath : 'VH_Categories',
-            Parameters : [
-                {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty : category_ID,
-                    ValueListProperty : 'ID',
-                },
-            ],
+    product     @Common: {Text: productName, };
+    category    @Common: {
+        Text           : category.category,
+        TextArrangement: #TextOnly,
+        ValueList      : {
+            $Type         : 'Common.ValueListType',
+            CollectionPath: 'VH_Categories',
+            Parameters    : [{
+                $Type            : 'Common.ValueListParameterInOut',
+                LocalDataProperty: category_ID,
+                ValueListProperty: 'ID',
+            }, ],
         },
     };
     subCategory @Common: {
-        Text : subCategory.subCategory,
-        TextArrangement : #TextOnly,
-        ValueList : {
-            $Type : 'Common.ValueListType',
-            CollectionPath : 'VH_SubCategories',
-            Parameters : [
+        Text           : subCategory.subCategory,
+        TextArrangement: #TextOnly,
+        ValueList      : {
+            $Type         : 'Common.ValueListType',
+            CollectionPath: 'VH_SubCategories',
+            Parameters    : [
                 {
-                    $Type : 'Common.ValueListParameterIn',      //Filtro que va a utilizar para mostrar las sub-categorias
-                    LocalDataProperty : category_ID,
-                    ValueListProperty : 'category_ID',
+                    $Type            : 'Common.ValueListParameterIn', //Filtro que va a utilizar para mostrar las sub-categorias
+                    LocalDataProperty: category_ID,
+                    ValueListProperty: 'category_ID',
                 },
                 {
-                    $Type : 'Common.ValueListParameterOut',
-                    LocalDataProperty : subCategory_ID,
-                    ValueListProperty : 'ID'
+                    $Type            : 'Common.ValueListParameterOut',
+                    LocalDataProperty: subCategory_ID,
+                    ValueListProperty: 'ID'
                 }
             ]
         },
     };
-    supplier @Common : { 
-        Text : supplier.supplierName,
-        TextArrangement : #TextOnly,
-        ValueList : {
-            $Type : 'Common.ValueListType',
-            CollectionPath : 'Suppliers',
-            Parameters : [
-                {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty : supplier_ID,    //Qué valor necesita? --> Necesita el ID seleccionado por el usuario
-                    ValueListProperty : 'ID',
-                },
-            ],
+    supplier    @Common: {
+        Text           : supplier.supplierName,
+        TextArrangement: #TextOnly,
+        ValueList      : {
+            $Type         : 'Common.ValueListType',
+            CollectionPath: 'Suppliers',
+            Parameters    : [{
+                $Type            : 'Common.ValueListParameterInOut',
+                LocalDataProperty: supplier_ID, //Qué valor necesita? --> Necesita el ID seleccionado por el usuario
+                ValueListProperty: 'ID',
+            }, ],
         },
     };
 };
 
 
-
 annotate myservice.Products with @(
-    UI.SelectionFields:[
+    UI.SelectionFields      : [
         productName,
         category_ID,
         subCategory_ID,
         supplier_ID,
         statu_code
     ],
-    UI.HeaderInfo: {
-        $Type : 'UI.HeaderInfoType',
-        TypeName : 'Product',
-        TypeNamePlural : 'Products',
-        Title : {
-            $Type : 'UI.DataField',
-            Value : productName
+    UI.HeaderInfo           : {
+        $Type         : 'UI.HeaderInfoType',
+        TypeName      : 'Product',
+        TypeNamePlural: 'Products',
+        Title         : {
+            $Type: 'UI.DataField',
+            Value: productName
         },
-        Description : {
-            $Type : 'UI.DataField',
-            Value : product
+        Description   : {
+            $Type: 'UI.DataField',
+            Value: product
         }
     },
-    UI.LineItem: [
+    UI.LineItem             : [
+        {
+            $Type : 'UI.DataField',
+            Value : image,
+        },
         {
             $Type: 'UI.DataField',
             Value: product
@@ -108,168 +112,200 @@ annotate myservice.Products with @(
         },
         {
             $Type : 'UI.DataFieldForAnnotation',
-            Target : 'supplier/@Communication.Contact',
+            Target: 'supplier/@Communication.Contact',
             Label : 'Supplier'
         },
         {
-            $Type: 'UI.DataField',
-            Value: statu.name,
-            Label : 'Status',
-            Criticality : statu.criricality,
-            @HTML5.CssDefaults : {
-                $Type : 'HTML5.CssDefaultsType',
-                width : '10rem',
+            $Type             : 'UI.DataField',
+            Value             : statu.name,
+            Label             : 'Status',
+            Criticality       : statu.criricality,
+            @HTML5.CssDefaults: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '10rem',
             },
         },
         {
-            $Type : 'UI.DataFieldForAnnotation',
-            Target : '@UI.DataPoint#Rating',
-            Label : 'Rating',
-            @HTML5.CssDefaults : {
-                $Type : 'HTML5.CssDefaultsType',
-                width : '10rem',
+            $Type             : 'UI.DataFieldForAnnotation',
+            Target            : '@UI.DataPoint#Rating',
+            Label             : 'Rating',
+            @HTML5.CssDefaults: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '10rem',
             },
         },
         {
-            $Type : 'UI.DataField',
-            Value : price,
-            @HTML5.CssDefaults : {
-                $Type : 'HTML5.CssDefaultsType',
-                width : '10rem',
+            $Type             : 'UI.DataField',
+            Value             : price,
+            @HTML5.CssDefaults: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '10rem',
             },
         }
-    ], 
-    UI.DataPoint #Rating : {
-        $Type : 'UI.DataPointType',
-        Value : rating,
-        Visualization : #Rating
+    ],
+    UI.DataPoint #Rating    : {
+        $Type        : 'UI.DataPointType',
+        Value        : rating,
+        Visualization: #Rating
     },
-    UI.DataPoint #Price : {
-        $Type : 'UI.DataPointType',
-        Value : price,
-        Visualization : #Number,
-        Title : 'Price'
+    UI.DataPoint #Price     : {
+        $Type        : 'UI.DataPointType',
+        Value        : price,
+        Visualization: #Number,
+        Title        : 'Price'
     },
-    UI.FieldGroup #Group_H_A : {
+    UI.FieldGroup #Picture: {
         $Type : 'UI.FieldGroupType',
         Data : [
             {
                 $Type : 'UI.DataField',
-                Value : category_ID
+                Value : image,
+                Label : '',
+            }
+        ],
+    },
+    UI.FieldGroup #Group_H_A: {
+        $Type: 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type: 'UI.DataField',
+                Value: category_ID
             },
             {
-                $Type : 'UI.DataField',
-                Value : subCategory_ID
+                $Type: 'UI.DataField',
+                Value: subCategory_ID
             },
             {
-                $Type : 'UI.DataField',
-                Value : supplier_ID
+                $Type: 'UI.DataField',
+                Value: supplier_ID
             }
         ]
     },
     UI.FieldGroup #Group_H_B: {
-        $Type : 'UI.FieldGroupType',
-        Data : [
-            {
-                $Type : 'UI.DataField',
-                Value : description
-            }
-        ]
+        $Type: 'UI.FieldGroupType',
+        Data : [{
+            $Type: 'UI.DataField',
+            Value: description
+        }]
     },
     UI.FieldGroup #Group_H_C: {
-        $Type : 'UI.FieldGroupType',
-        Data : [
-            {
-                $Type : 'UI.DataField',
-                Value : statu.name,
-                Criticality : statu.criricality,
-                Label : ''
-            },
-        ],
+        $Type: 'UI.FieldGroupType',
+        Data : [{
+            $Type      : 'UI.DataField',
+            Value      : statu.name,
+            Criticality: statu.criricality,
+            Label      : ''
+        }, ],
     },
-    UI.HeaderFacets  : [
+    UI.HeaderFacets         : 
+    [
         {
             $Type : 'UI.ReferenceFacet',
-            Target : '@UI.FieldGroup#Group_H_A',
+            Target : '@UI.FieldGroup#Picture',
         },
         {
             $Type : 'UI.ReferenceFacet',
-            Target : '@UI.FieldGroup#Group_H_B',
+            Target: '@UI.FieldGroup#Group_H_A',
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
+            Target: '@UI.FieldGroup#Group_H_B',
             Label : 'Product Description'
         },
         {
             $Type : 'UI.ReferenceFacet',
-            Target : '@UI.FieldGroup#Group_H_C',
+            Target: '@UI.FieldGroup#Group_H_C',
             Label : 'Availability'
         },
         {
             $Type : 'UI.ReferenceFacet',
-            Target : '@UI.DataPoint#Price',
+            Target: '@UI.DataPoint#Price',
             Label : 'Price'
         },
     ],
-    UI.FieldGroup #Group_B_A : {
-        $Type : 'UI.FieldGroupType',
+    UI.FieldGroup #Group_B_A: {
+        $Type: 'UI.FieldGroupType',
         Data : [
             {
-                $Type : 'UI.DataField',
-                Value : productName
+                $Type: 'UI.DataField',
+                Value: productName
             },
             {
-                $Type : 'UI.DataField',
-                Value : description
+                $Type: 'UI.DataField',
+                Value: description
             },
             {
-                $Type : 'UI.DataField',
-                Value : category_ID
+                $Type: 'UI.DataField',
+                Value: category_ID
             },
             {
-                $Type : 'UI.DataField',
-                Value : subCategory_ID
+                $Type: 'UI.DataField',
+                Value: subCategory_ID
             },
             {
-                $Type : 'UI.DataField',
-                Value : supplier_ID
+                $Type: 'UI.DataField',
+                Value: supplier_ID
             }
         ]
     },
-    UI.FieldGroup #Group_B_B : {
-        $Type : 'UI.FieldGroupType',
+    UI.FieldGroup #Group_B_B: {
+        $Type: 'UI.FieldGroupType',
         Data : [
             {
-                $Type : 'UI.DataField',
-                Value : detail.width,
+                $Type: 'UI.DataField',
+                Value: detail.width,
             },
             {
-                $Type : 'UI.DataField',
-                Value : detail.height,
+                $Type: 'UI.DataField',
+                Value: detail.height,
             },
             {
-                $Type : 'UI.DataField',
-                Value : detail.depth,
+                $Type: 'UI.DataField',
+                Value: detail.depth,
             },
             {
-                $Type : 'UI.DataField',
-                Value : detail.weight,
+                $Type: 'UI.DataField',
+                Value: detail.weight,
             },
         ],
     },
-    UI.Facets  : [
+    UI.Facets               : [
         {
             $Type : 'UI.CollectionFacet',
-            Facets : [
+            Facets: [
                 {
                     $Type : 'UI.ReferenceFacet',
-                    Target : '@UI.FieldGroup#Group_B_A',
-                    Label : 'Product Information'
+                    Target: 'supplier/@UI.FieldGroup#SupplierInformation',
+                    Label : 'Information',
                 },
                 {
                     $Type : 'UI.ReferenceFacet',
-                    Target : '@UI.FieldGroup#Group_B_B',
-                    Label : 'Product Details'
+                    Target: 'supplier/contact/@UI.FieldGroup#Contacts',
+                    Label : 'Contact Information'
                 }
             ],
-            Label : 'General Information'
+            Label : 'Supplier Information',
+            ID    : 'SupplierInformation',
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
+            Target: '@UI.FieldGroup#Group_B_B',
+            Label : 'Product Details'
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
+            Target: 'toReviews/@UI.LineItem#Reviews',
+            Label : 'Reviews'
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
+            Target: 'toInventories/@UI.LineItem#Inventories',
+            Label : 'Inventories'
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
+            Target: 'toSales/@UI.Chart',
+            Label : 'Sales'
         }
     ],
 );
