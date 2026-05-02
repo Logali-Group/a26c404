@@ -11,18 +11,22 @@ annotate myservice.Products with {
     image       @title: 'Image' @UI.IsImage;
     product     @title: 'Product';
     productName @title: 'Product Name';
-    description @title: 'Description';
+    description @title: 'Description' @UI.MultiLineText;
     category    @title: 'Category';
     subCategory @title: 'Sub-Category';
     supplier    @title: 'Supplier';
     statu       @title: 'Status';
     rating      @title: 'Rating';
-    price       @title: 'Price'     @Measures.ISOCurrency: currency;
+    price       @title: 'Price'     @Measures.ISOCurrency: currency_code;
     currency    @title: 'Currency'  @Common.IsCurrency;
 };
 
 annotate myservice.Products with {
     product     @Common: {Text: productName, };
+    statu @Common: {
+        Text : statu.name,
+        TextArrangement : #TextOnly
+    };
     category    @Common: {
         Text           : category.category,
         TextArrangement: #TextOnly,
@@ -73,6 +77,19 @@ annotate myservice.Products with {
 
 
 annotate myservice.Products with @(
+    Common.SideEffects: {
+        $Type : 'Common.SideEffectsType',
+        SourceProperties : [
+            supplier_ID
+        ],
+        TargetEntities : [
+            supplier
+        ],
+    },
+    // Common.SideEffects #ImageChanged : {
+    //     SourceProperties : [ image, fileName, imageType ],
+    //     TargetProperties : [ 'image', 'fileName', 'imageType' ],
+    // },
     UI.SelectionFields      : [
         productName,
         category_ID,
@@ -192,9 +209,25 @@ annotate myservice.Products with @(
         $Type: 'UI.FieldGroupType',
         Data : [{
             $Type      : 'UI.DataField',
-            Value      : statu.name,
+            Value      : statu_code,
             Criticality: statu.criricality,
-            Label      : ''
+            Label      : '',
+            @Common.FieldControl : {
+                $edmJson: {
+                    $If: [
+                        {
+                            $Eq: [
+                                {
+                                    $Path: 'IsActiveEntity'
+                                },
+                                false
+                            ]
+                        },
+                        1,
+                        3
+                    ]
+                }
+            },
         }, ],
     },
     UI.HeaderFacets         : 

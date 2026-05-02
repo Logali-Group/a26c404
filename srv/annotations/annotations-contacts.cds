@@ -2,9 +2,9 @@ using {Products as myservice} from '../service';
 
 
 annotate myservice.Contacts with {
-    fullName @title : 'Full Name';
-    email @title : 'Email';
-    phoneNumber @title : 'Phone Number';
+    fullName @title : 'Full Name'  @Common.FieldControl:#ReadOnly;
+    email @title : 'Email'  @Common.FieldControl:#ReadOnly;
+    phoneNumber @title : 'Phone Number'  @Common.FieldControl:#ReadOnly;
 };
 
 annotate myservice.Contacts with @(
